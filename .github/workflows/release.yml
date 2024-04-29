@@ -1,0 +1,41 @@
+name: Create release
+on: [push]
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set variables
+      id: set_variables
+      run: |
+        echo "::group::Variables"
+        cat << EOF | tee -a "$GITHUB_OUTPUT"
+        tag=$(git describe --tags --abbrev=0)
+        version=v$(sed -n 's/^version\s*=\s*"\(.*\)"$/\1/p' pyproject.toml)
+        EOF
+        echo "::endgroup::"
+
+    - name: Bundle and create release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        tag: ${{ steps.set_variables.outputs.tag }}
+        version: ${{ steps.set_variables.outputs.version }}
+      if: |
+        env.tag != env.version
+      run: |
+        files=(*)
+
+        mkdir bundle/
+        cp -rt bundle -- "${files[@]}"
+
+        cd bundle/
+        zip -9 --recurse-paths yt-dlp-ChromeCookieUnlock *
+        gh release create "${version}" --latest \
+          --title "yt-dlp-ChromeCookieUnlock ${version}" \
+          'yt-dlp-ChromeCookieUnlock.zip'

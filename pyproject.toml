@@ -1,6 +1,19 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling >=1.9.0, <2"]
+build-backend = "hatchling.build"
 
-[tool.distutils.bdist_wheel]
-universal = true
+[project]
+name = "yt-dlp-ChromeCookieUnlock"
+description = "A yt-dlp plugin to unlock the cookie database of chromium-based browsers"
+authors = [{name = "sepro", email = "sepro@sepr0.com"}]
+version = "2024.04.29"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+keywords = [
+    "yt-dlp",
+    "yt-dlp-plugins",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["yt_dlp_plugins"]
